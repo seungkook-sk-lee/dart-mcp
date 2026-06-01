@@ -1,3 +1,33 @@
+import asyncio
+
+# ==========================================
+# 🚨 Prefect Horizon 플랫폼 버그 방어용 정밀 패치 🚨
+# ==========================================
+try:
+    # 1. Horizon 러너가 이미 루프를 돌리고 있는지 확인합니다.
+    asyncio.get_running_loop()
+    
+    # 2. 루프가 있다면, nest_asyncio를 적용해 중첩을 허용합니다.
+    import nest_asyncio
+    nest_asyncio.apply()
+    
+    # 3. 에러를 뱉는 주범(anyio)에게만 "루프가 없다"고 거짓말을 하는 가짜 객체를 만듭니다.
+    import anyio._backends._asyncio
+    class DummyAsyncio:
+        def __getattr__(self, name):
+            if name == 'get_running_loop':
+                def _fake(): raise RuntimeError("Spoofed")
+                return _fake
+            return getattr(asyncio, name)
+            
+    # 4. anyio의 시야에만 가짜 asyncio를 덮어씌워 에러를 무사통과시킵니다.
+    anyio._backends._asyncio.asyncio = DummyAsyncio()
+
+except RuntimeError:
+    # 실행 중인 루프가 없다면 (빌드 단계: fastmcp inspect) 패치를 무시하고 정상 통과합니다.
+    pass
+# ==========================================
+
 from dotenv import load_dotenv
 import os
 import httpx
