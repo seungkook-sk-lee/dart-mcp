@@ -10,6 +10,16 @@ import traceback
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
+import asyncio
+import nest_asyncio
+
+# 플랫폼 러너가 이미 루프를 실행 중인 경우를 대비해 중첩 루프 허용
+try:
+    asyncio.get_running_loop()
+    nest_asyncio.apply()
+except RuntimeError:
+    pass  # 실행 중인 루프가 없으면 정상 진행
+
 load_dotenv()
 # 상수 정의
 # API 설정
