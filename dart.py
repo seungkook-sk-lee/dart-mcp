@@ -1,6 +1,3 @@
-import nest_asyncio
-nest_asyncio.apply()
-
 import httpx
 from typing import Any, Dict, List, Optional, Tuple, Set
 from mcp.server.fastmcp import FastMCP, Context
