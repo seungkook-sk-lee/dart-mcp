@@ -10,6 +10,8 @@ import traceback
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
+import nest_asyncio
+nest_asyncio.apply()
 
 load_dotenv()
 # 상수 정의
