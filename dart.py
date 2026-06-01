@@ -1515,8 +1515,3 @@ async def search_json_financial_data(
     
     result += chat_guideline
     return result.strip()
-
-
-# 서버 실행 코드
-if __name__ == "__main__":
-    mcp.run(transport='stdio')
