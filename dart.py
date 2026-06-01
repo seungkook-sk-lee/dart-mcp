@@ -1,24 +1,25 @@
-import httpx
-from typing import Any, Dict, List, Optional, Tuple, Set
-from mcp.server.fastmcp import FastMCP, Context
-import os
-import zipfile
-import xml.etree.ElementTree as ET
-from io import BytesIO, StringIO
-import re
-import traceback
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-
 import asyncio
 import nest_asyncio
+import sys
 
-# 플랫폼 러너가 이미 루프를 실행 중인 경우를 대비해 중첩 루프 허용
+# ==========================================
+# 🚨 플랫폼(Horizon) 충돌 방지용 우회 패치 🚨
+# ==========================================
 try:
-    asyncio.get_running_loop()
-    nest_asyncio.apply()
-except RuntimeError:
-    pass  # 실행 중인 루프가 없으면 정상 진행
+    import anyio._backends._asyncio
+    # FastMCP(anyio)가 플랫폼의 루프를 감지하고 에러를 뱉지 않도록 강제로 숨김
+    anyio._backends._asyncio.asyncio.get_running_loop = lambda: None
+except Exception:
+    pass
+
+# asyncio 자체의 중첩 허용
+nest_asyncio.apply()
+# ==========================================
+
+from dotenv import load_dotenv
+import os
+import httpx
+from mcp.server.fastmcp import FastMCP
 
 load_dotenv()
 # 상수 정의
