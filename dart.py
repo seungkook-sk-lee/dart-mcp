@@ -1,3 +1,27 @@
+import asyncio
+import sys
+
+# ==========================================
+# 🚨 플랫폼(Horizon) 충돌 방지용 조건부 우회 패치 🚨
+# ==========================================
+try:
+    # 1. 현재 실행 중인 이벤트 루프가 있는지 확인합니다.
+    asyncio.get_running_loop()
+    
+    # 2. 루프가 있다면 (런타임 환경) 중첩을 허용하고 anyio를 속입니다.
+    import nest_asyncio
+    nest_asyncio.apply()
+    
+    import anyio._backends._asyncio
+    def _fake_get_running_loop():
+        raise RuntimeError("no running event loop")
+    anyio._backends._asyncio.asyncio.get_running_loop = _fake_get_running_loop
+
+except RuntimeError:
+    # 3. 루프가 없다면 (빌드 환경: fastmcp inspect) 아무것도 하지 않습니다.
+    pass
+# ==========================================
+
 from dotenv import load_dotenv
 import os
 import httpx
@@ -62,7 +86,7 @@ BALANCE_SHEET_PATTERNS = {
 INVALID_VALUE_INDICATORS = {"N/A", "XBRL 파싱 오류", "데이터 추출 오류"}
 
 # MCP 서버 초기화
-mcp = FastMCP("dart", async_fallback=True)
+mcp = FastMCP("dart")
 
 # 재무제표 유형 정의
 STATEMENT_TYPES = {
