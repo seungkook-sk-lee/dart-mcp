@@ -11,9 +11,6 @@ import traceback
 from datetime import datetime, timedelta
 
 load_dotenv()
-# ... 이하 기존 상수가 정의된 코드 그대로 유지 ...
-
-load_dotenv()
 # 상수 정의
 # API 설정
 API_KEY = os.environ.get("DART_API_KEY")  # 환경 변수에서 API 키 로드, 없으면 기본값 사용
