@@ -1,33 +1,17 @@
-import asyncio
-import nest_asyncio
-import sys
-
-# ==========================================
-# 🚨 플랫폼(Horizon) 충돌 방지용 우회 패치 🚨
-# ==========================================
-try:
-    import anyio._backends._asyncio
-    # FastMCP(anyio)가 플랫폼의 루프를 감지하고 에러를 뱉지 않도록 강제로 숨김
-    anyio._backends._asyncio.asyncio.get_running_loop = lambda: None
-except Exception:
-    pass
-
-# asyncio 자체의 중첩 허용
-nest_asyncio.apply()
-# ==========================================
-
 from dotenv import load_dotenv
 import os
 import httpx
 from typing import Any, Dict, List, Optional, Tuple, Set
 from mcp.server.fastmcp import FastMCP, Context
-import os
 import zipfile
 import xml.etree.ElementTree as ET
 from io import BytesIO, StringIO
 import re
 import traceback
 from datetime import datetime, timedelta
+
+load_dotenv()
+# ... 이하 기존 상수가 정의된 코드 그대로 유지 ...
 
 load_dotenv()
 # 상수 정의
@@ -81,7 +65,7 @@ BALANCE_SHEET_PATTERNS = {
 INVALID_VALUE_INDICATORS = {"N/A", "XBRL 파싱 오류", "데이터 추출 오류"}
 
 # MCP 서버 초기화
-mcp = FastMCP("dart")
+mcp = FastMCP("dart", async_fallback=True)
 
 # 재무제표 유형 정의
 STATEMENT_TYPES = {
